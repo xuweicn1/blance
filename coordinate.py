@@ -7,6 +7,8 @@ GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
 
 
+
+
 DT1 = 17
 SCK1 = 18
 
@@ -17,7 +19,7 @@ DT3 = 26
 SCK3 = 20
 
 DIF = 250  # 波动系数
-ROT = 300.37  # 称重系数
+ROT = 297.53  # 称重系数
 
 
 def zero_fun():
@@ -55,14 +57,44 @@ def calculate_weight():
     w = [i/ROT for i in d]
     return w
 
+    
+def weigth_to_csv(file,lst,lenth):
+    """将列表写入文件"""
+    with open(file, 'a') as csvfile:
+        for i, v in enumerate(lst):
+            csvfile.write(str(v)+',')
+        csvfile.write(str(lenth)+'\n')
+        # csvfile.write()
+
+def coordinate(x):
+    """
+    y = -0.4809x + 119.91 线性关系式
+    x：子秤重量
+    y：距离子秤距离
+    """
+    return (-0.4809) * x + 119.91
+
 
 initial = zero_fun()
 
+position = [0,0,0]
+
 if __name__ == '__main__':
+
+
 
     while True:
         time.sleep(2)
         w = calculate_weight()
+        if w[0] < 2:
+            position = [0,0,0]
+        else:
+            position[0] = coordinate(w[1])
+            position[1] = coordinate(w[2])
+            position[2] = coordinate(w[3])
+        
         print('实 重：{:.2f}g;\n秤--1：{:.2f}g;\n秤--2：{:.2f}g;\n秤--3：{:.2f}g;'.format(
             w[0], w[1], w[2], w[3]))
+        print(position)
         print('*'*20)
+
