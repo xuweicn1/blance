@@ -27,7 +27,7 @@ def zero_fun():
 
 def calculate_ratio(W=50):
     """计算称重系数"""
-    print('请放{}g砝码...'.format(W))
+    print('请放{}g标准重物...'.format(W))
     time.sleep(5)
     cont = zero_fun()
     d = list(map(lambda x, y: x - y, cont, initial))
@@ -43,12 +43,13 @@ def calculate_weight():
     w = list(map(lambda x, y: x / y, d, ROT))   # 称重
     return w
 
-def weigth_to_csv(file,lst,lenth):
+def weigth_to_csv(file,lst,lenth,ps):
     """将列表写入文件"""
     with open(file, 'a') as csvfile:
+        csvfile.write(str(lenth)+',')
         for i, v in enumerate(lst):
             csvfile.write(str(v)+',')
-        csvfile.write(str(lenth)+'\n')
+        csvfile.write(str(ps) + '\n')
         
 def coordinate(m,M,R):
     """
@@ -57,7 +58,8 @@ def coordinate(m,M,R):
     x：子秤重量
     y：距离子秤距离
     """
-    return -((2*R)/(3*M))*m + 1.667*R
+    y = -((2*R)/(3*M))*m + 1.667*R
+    return round(y,2)
 
 initial = zero_fun()
 
@@ -66,21 +68,21 @@ position = [0,0,0]
 
 if __name__ == '__main__':
 
-    r = calculate_ratio(871)  # 计算重量系数
-    print(r)
+    # r = calculate_ratio(200)  # 计算重量系数
+    # print(r)
 
-    # while True:
-        # time.sleep(2)
-        # w = calculate_weight()    
-        # weigth_to_csv('0310.csv',w,6.28318530717959)  #导出数据
-        
-        # if w[0] < 3:
-            # position = [0,0,0]
-        # else:
-            # position[0] = coordinate(w[1],w[0],R)
-            # position[1] = coordinate(w[2],w[0],R)
-            # position[2] = coordinate(w[3],w[0],R)
-        # print('实 重：{:.2f}g;\n秤--1：{:.2f}g;\n秤--2：{:.2f}g;\n秤--3：{:.2f}g;'.format(
-            # w[0], w[1], w[2], w[3]))
-        # print(position)
-        # print('*'*20)
+    while True:
+        time.sleep(2)
+        w = calculate_weight() 
+        if w[0] < 3:
+            position = [0,0,0]
+        else:
+            position[0] = coordinate(w[1],w[0],R)
+            position[1] = coordinate(w[2],w[0],R)
+            position[2] = coordinate(w[3],w[0],R)
+        print('实 重：{:.2f}g;\n秤--1：{:.2f}g;\n秤--2：{:.2f}g;\n秤--3：{:.2f}g;'.format(
+            w[0], w[1], w[2], w[3]))
+        print(position)
+        print('*'*20)
+        ts = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+        weigth_to_csv('0318.csv',w,ts,position)  #导出数据
